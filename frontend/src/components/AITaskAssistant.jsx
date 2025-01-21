@@ -4,7 +4,9 @@ import axios from "axios";
 const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [reminderSuggestions, setReminderSuggestions] = useState({});
   const [error, setError] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
 
   const userPreferences = {
     workingHours: "9:00-17:00",
@@ -51,7 +53,11 @@ const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
         },
         { withCredentials: true },
       );
-      return response.data;
+      setReminderSuggestions((prev) => ({
+        ...prev,
+        [task._id]: response.data,
+      }));
+      setActiveTask(task._id);
     } catch (err) {
       setError("Failed to get reminder suggestions");
       console.error(err);
@@ -79,6 +85,43 @@ const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
           {loading ? "Analyzing..." : "Analyze Tasks"}
         </button>
 
+        {/* Task List with Reminder Suggestions */}
+        <div className="mt-4 space-y-4">
+          {tasks.map((task) => (
+            <div key={task._id} className="border rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium">{task.title}</h3>
+                <button
+                  onClick={() => getSuggestedReminders(task)}
+                  disabled={loading}
+                  className="text-blue-500 hover:text-blue-600"
+                >
+                  Get Reminder Suggestions
+                </button>
+              </div>
+
+              {/* Show reminder suggestions if available for this task */}
+              {reminderSuggestions[task._id] && activeTask === task._id && (
+                <div className="bg-blue-50 p-3 rounded mt-2">
+                  <h4 className="font-medium text-sm mb-2">
+                    Reminder Suggestions
+                  </h4>
+                  <div className="text-sm space-y-1">
+                    {reminderSuggestions[task._id].suggestions
+                      ?.split("\n")
+                      .map((suggestion, index) => (
+                        <div key={index} className="text-gray-700">
+                          {suggestion}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Existing Analysis Display */}
         {analysis && (
           <div className="mt-4 space-y-4">
             <div className="bg-gray-50 p-4 rounded">
