@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useWeb3 } from "../contexts/Web3Context";
 import { useAuth } from "../contexts/AuthContext";
-import Web3 from "web3";
+
 import AITaskAssistant from "../components/AITaskAssistant";
 import { SUPPORTED_NETWORKS, DEFAULT_NETWORK } from "../contracts/networks";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -211,6 +211,15 @@ const TaskManager = () => {
     }
   };
 
+  const completetionPercentage = useMemo(() => {
+    if (tasks.length === 0) return 100;
+    return (
+      (tasks.filter((task) => task.status === "completed").length /
+        tasks.length) *
+      100
+    );
+  }, [tasks]);
+
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
@@ -329,6 +338,11 @@ const TaskManager = () => {
                     : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 }`}
               disabled={!web3 || !contract || !account || !isNetworkSupported}
+              title={
+                !web3 || !contract || !account || !isNetworkSupported
+                  ? "Please connect your wallet and switch to the correct network"
+                  : ""
+              }
             >
               Add Task
             </button>
@@ -355,6 +369,8 @@ const TaskManager = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Your Tasks</h2>
           </div>
+
+          <div> Task Completion Percentage : {completetionPercentage} %</div>
 
           {tasks.map((task) => (
             <div
