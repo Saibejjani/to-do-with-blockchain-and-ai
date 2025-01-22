@@ -12,6 +12,7 @@ router.post("/signin", async (req, res) => {
     const token = await User.matchPasswordAndGenrateToken(email, password);
     res.cookie("token", token, {
       httpOnly: false,
+      sameSite: "none",
     });
     return res.json({ message: "logged in successfully" });
   } catch (error) {

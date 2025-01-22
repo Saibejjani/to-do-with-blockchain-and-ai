@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
   const [loading, setLoading] = useState(false);
@@ -25,12 +26,12 @@ const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
     setError(null);
     try {
       const response = await axios.post(
-        "http://localhost:8080/ai/analyze-priorities",
+        `${BACKEND_URL}/ai/analyze-priorities`,
         {
           tasks,
           preferences: userPreferences,
         },
-        { withCredentials: true },
+        { withCredentials: true }
       );
       setAnalysis(response.data);
     } catch (err) {
@@ -46,12 +47,12 @@ const AITaskAssistant = ({ tasks, onUpdatePriorities }) => {
     setError(null);
     try {
       const response = await axios.post(
-        "http://localhost:8080/ai/suggest-reminders",
+        `${BACKEND_URL}/ai/suggest-reminders`,
         {
           task,
           preferences: userPreferences,
         },
-        { withCredentials: true },
+        { withCredentials: true }
       );
       setReminderSuggestions((prev) => ({
         ...prev,

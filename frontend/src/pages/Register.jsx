@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/user/signup",
+        `${BACKEND_URL}/user/signup`,
         {
           fullName: formData.fullName,
           email: formData.email,
@@ -42,7 +42,7 @@ const Register = () => {
         },
         {
           withCredentials: true,
-        },
+        }
       );
 
       if (response.data === "successfully registered") {
@@ -51,7 +51,7 @@ const Register = () => {
     } catch (err) {
       setError(
         err.response?.data?.error?.message ||
-          "An error occurred during registration",
+          "An error occurred during registration"
       );
     } finally {
       setLoading(false);

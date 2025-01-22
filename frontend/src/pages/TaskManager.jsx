@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import Web3 from "web3";
 import AITaskAssistant from "../components/AITaskAssistant";
 import { SUPPORTED_NETWORKS, DEFAULT_NETWORK } from "../contracts/networks";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const TaskManager = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,13 +42,13 @@ const TaskManager = () => {
       { t: "string", v: task.description },
       { t: "string", v: task.status },
       { t: "uint256", v: new Date(task.dueDate).getTime() },
-      { t: "string", v: user._id },
+      { t: "string", v: user._id }
     );
   };
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/tasks", {
+      const response = await axios.get(`${BACKEND_URL}/tasks`, {
         withCredentials: true,
       });
       setTasks(response.data);
@@ -121,7 +122,7 @@ const TaskManager = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:8080/tasks", newTask, {
+      await axios.post(`${BACKEND_URL}/tasks`, newTask, {
         withCredentials: true,
       });
       setNewTask({
@@ -161,7 +162,7 @@ const TaskManager = () => {
       if (tx.status) {
         // Update task status in backend
         await axios.put(
-          `http://localhost:8080/tasks/${taskId}`,
+          `${BACKEND_URL}/tasks/${taskId}`,
           {
             ...task,
             status: "completed",
@@ -169,7 +170,7 @@ const TaskManager = () => {
           },
           {
             withCredentials: true,
-          },
+          }
         );
 
         fetchTasks();
@@ -182,7 +183,7 @@ const TaskManager = () => {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://localhost:8080/tasks/${taskId}`, {
+      await axios.delete(`${BACKEND_URL}/tasks/${taskId}`, {
         withCredentials: true,
       });
       fetchTasks();
@@ -198,7 +199,7 @@ const TaskManager = () => {
       if (editTask.status === "completed") {
         await handleMarkComplete(taskId, editTask);
       } else {
-        await axios.put(`http://localhost:8080/tasks/${taskId}`, editTask, {
+        await axios.put(`${BACKEND_URL}/tasks/${taskId}`, editTask, {
           withCredentials: true,
         });
       }
@@ -459,7 +460,9 @@ const TaskManager = () => {
                         Due: {new Date(task.dueDate).toLocaleDateString()}
                       </span>
                       <span
-                        className={`px-3 py-1 rounded-full text-sm ${getStatusColor(task.status)}`}
+                        className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
+                          task.status
+                        )}`}
                       >
                         {task.status}
                       </span>

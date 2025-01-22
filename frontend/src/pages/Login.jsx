@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,17 +26,18 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/user/signin",
+        `${BACKEND_URL}/user/signin`,
         formData,
         {
           withCredentials: true,
-        },
+        }
       );
 
       if (response.data.message === "logged in successfully") {
         navigate("/tasks"); // Redirect to tasks page after successful login
       }
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.error || "An error occurred during login");
     } finally {
       setLoading(false);
